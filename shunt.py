@@ -25,13 +25,16 @@ output = odr_instance.run()
 fitted_resistance, fitted_offset = output.beta
 resistance_std_err, offset_std_err = output.sd_beta
 
-print("Fitted resistance:", fitted_resistance, "±", resistance_std_err)
-print("Fitted offset:", fitted_offset, "±", offset_std_err)
+fitted_resistance_ohm = fitted_resistance / 1000
+resistance_std_err_ohm = resistance_std_err / 1000
+
+print("Fitted resistance: {:.7f} Ω ± {:.7f} Ω".format(fitted_resistance_ohm, resistance_std_err_ohm))
+print("Fitted offset: {:.7f} mV ± {:.7f} mV".format(fitted_offset, offset_std_err))
 
 plt.errorbar(current, voltage, yerr=voltage_uncertainty, fmt='o', label='Data points', capsize=4) # Plotting uncertainty bars of the x axis were omitted since it is tiny, to plot them, add the parameter `xerr=current_uncertainty` to the function
 x = np.linspace(0, 10, 100)
 y = linear_model(output.beta, x)
-plt.plot(x, y, 'r-', label='Fitted line')
+plt.plot(x, y, 'r-', label='Fitted line: y = {:.2f}x + {:.2f}'.format(fitted_resistance, fitted_offset))
 plt.title('Current vs Voltage')
 plt.xlabel('Current (A)')
 plt.ylabel('Voltage (mV)')
