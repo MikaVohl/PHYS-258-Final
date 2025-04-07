@@ -28,7 +28,7 @@ resistance_std_err, offset_std_err = output.sd_beta
 fitted_resistance_ohm = fitted_resistance / 1000
 resistance_std_err_ohm = resistance_std_err / 1000
 
-print("Fitted resistance: {:.7f} Ω ± {:.7f} Ω".format(fitted_resistance_ohm, resistance_std_err_ohm))
+print("Fitted resistance: {:.8f} Ω ± {:.8f} Ω".format(fitted_resistance_ohm, resistance_std_err_ohm))
 print("Fitted offset: {:.7f} mV ± {:.7f} mV".format(fitted_offset, offset_std_err))
 
 plt.errorbar(current, voltage, yerr=voltage_uncertainty, fmt='o', label='Data points', capsize=4) # Plotting uncertainty bars of the x axis were omitted since it is tiny, to plot them, add the parameter `xerr=current_uncertainty` to the function
