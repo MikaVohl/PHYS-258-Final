@@ -1,5 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
+from scale import scale_to_true
 
 # Load and clean the data
 data = np.genfromtxt('258-Magneto.csv', delimiter=',')
@@ -13,8 +14,20 @@ voltage_drop = np.abs(data[:, 3]) * 1e-3  # Convert mV to V
 supply_current = data[:, 4] # in Amperes
 
 # Constants
+PLATFORM_MASS = 43.54 * 1e-3 # kg
+BASELINE_MASS = 102.62 * 1e-3 - PLATFORM_MASS # kg
 SHUNT_RESISTANCE = 0.0009521 # in Ohms
-SUNT_RESISTANCE_ERR = 0.0000017 # in Ohms
+SHUNT_RESISTANCE_ERR = 0.0000017 # in Ohms
+
+print(initial_mass)
+print(final_mass)
+initial_mass, init_mass_unc = scale_to_true(initial_mass + BASELINE_MASS)
+final_mass, final_mass_unc = scale_to_true(final_mass + BASELINE_MASS)
+initial_mass -= BASELINE_MASS
+final_mass -= BASELINE_MASS
+print(initial_mass)
+print(final_mass)
+
 g = 9.81  # m/s^2
 l = 20 * 1e-2  # rod length in meters
 mu_0 = 4 * np.pi * 1e-7

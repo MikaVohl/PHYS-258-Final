@@ -67,28 +67,29 @@ m, b = popt
 error_fit = linear(x_all, *popt)
 residuals = error - error_fit
 
-plt.figure(figsize=(10, 6))
-plt.scatter(x_all, error, label='Data Points', alpha=0.5)
-plt.plot(x_all, error_fit, 'r-', label='Fitted Line: y = {:.2f}x + {:.2f}'.format(m, b))
-plt.axhline(0, color='red', linestyle='--', label='Ideal Line')
-plt.xlabel('True Mass (g)')
-plt.ylabel('Scale Reading (g)')
-plt.title('Scale Reading vs True Mass')
-plt.grid(True)
-plt.legend()
-plt.show()
+def plot_scale():
+    plt.figure(figsize=(10, 6))
+    plt.scatter(x_all, error, label='Data Points', alpha=0.5)
+    plt.plot(x_all, error_fit, 'r-', label='Fitted Line: y = {:.2f}x + {:.2f}'.format(m, b))
+    plt.axhline(0, color='red', linestyle='--', label='Ideal Line')
+    plt.xlabel('True Mass (g)')
+    plt.ylabel('Scale Reading (g)')
+    plt.title('Scale Reading vs True Mass')
+    plt.grid(True)
+    plt.legend()
+    plt.show()
 
-# Plot residuals
-plt.figure(figsize=(10, 6))
-plt.scatter(x_all, residuals, label='Residuals', alpha=0.5)
-# plt.errorbar(x_all, residuals, yerr=0.1, fmt='o', label='Residuals', capsize=4)
-plt.axhline(0, color='red', linestyle='--')
-plt.xlabel('True Mass (g)')
-plt.ylabel('Residuals (g)')
-plt.title('Residuals of Scale Reading vs True Mass')
-plt.grid(True)
-plt.legend()
-plt.show()
+    # Plot residuals
+    plt.figure(figsize=(10, 6))
+    plt.scatter(x_all, residuals, label='Residuals', alpha=0.5)
+    # plt.errorbar(x_all, residuals, yerr=0.1, fmt='o', label='Residuals', capsize=4)
+    plt.axhline(0, color='red', linestyle='--')
+    plt.xlabel('True Mass (g)')
+    plt.ylabel('Residuals (g)')
+    plt.title('Residuals of Scale Reading vs True Mass')
+    plt.grid(True)
+    plt.legend()
+    plt.show()
 
 def scale_to_true_mass_and_uncertainty(y, m, b, sigma_y, sigma_m, sigma_b, cov_mb):
     # Convert scale reading to true mass
@@ -109,15 +110,16 @@ def scale_to_true_mass_and_uncertainty(y, m, b, sigma_y, sigma_m, sigma_b, cov_m
     
     return x, sigma_x
 
-sigma_scale = np.std(residuals)
+convert_params = {
+    'm': m,
+    'b': b,
+    'sigma_y': np.std(residuals),
+    'sigma_m': np.sqrt(pcov[0, 0]),
+    'sigma_b': np.sqrt(pcov[1, 1]),
+    'cov_mb': pcov[0, 1]
+}
 
-def scale_to_true(scale, sigma_scale):
-    # Use your fitted parameters
-    global m, b, pcov
-    sigma_m = np.sqrt(pcov[0, 0])
-    sigma_b = np.sqrt(pcov[1, 1])
-    cov_mb  = pcov[0, 1]
-    return scale_to_true_mass_and_uncertainty(scale, m, b, sigma_scale, sigma_m, sigma_b, cov_mb)
-
-
-print(scale_to_true(50, sigma_scale))
+def scale_to_true(y):
+    # Convert scale reading to true mass
+    x, sigma_x = scale_to_true_mass_and_uncertainty(y, **convert_params)
+    return x, sigma_x
