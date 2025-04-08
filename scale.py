@@ -123,3 +123,5 @@ def scale_to_true(y):
     # Convert scale reading to true mass
     x, sigma_x = scale_to_true_mass_and_uncertainty(y, **convert_params)
     return x, sigma_x
+
+plot_scale()

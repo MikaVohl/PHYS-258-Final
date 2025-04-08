@@ -17,27 +17,47 @@ supply_current = data[:, 4] # in Amperes
 PLATFORM_MASS = 43.54 * 1e-3 # kg
 BASELINE_MASS = 102.62 * 1e-3 - PLATFORM_MASS # kg
 SHUNT_RESISTANCE = 0.0009521 # in Ohms
-SHUNT_RESISTANCE_ERR = 0.0000017 # in Ohms
+SHUNT_RESISTANCE_UNC = 0.0000017 # in Ohms
+PRINT_UNC = 0.2 * 1e-3 # in meters (0.4 mm nozzle size on 3D printer)
+VOLTAGE_DROP_UNC = 0.1 * 1e-3 # in Volts (0.1 mV)
 
-print(initial_mass)
-print(final_mass)
 initial_mass, init_mass_unc = scale_to_true(initial_mass + BASELINE_MASS)
 final_mass, final_mass_unc = scale_to_true(final_mass + BASELINE_MASS)
 initial_mass -= BASELINE_MASS
 final_mass -= BASELINE_MASS
-print(initial_mass)
-print(final_mass)
+
+height_unc = PRINT_UNC # Possibly consider height uncertainty being 0.5mm since thats the absolute max it could be off by
 
 g = 9.81  # m/s^2
 l = 20 * 1e-2  # rod length in meters
+l_unc = 0
+# rod length uncertainty is negligible due to the higher uncertainty of other parameters
 mu_0 = 4 * np.pi * 1e-7
 measured_current = voltage_drop / SHUNT_RESISTANCE # in Amperes
+measured_current_unc = np.sqrt(
+    (VOLTAGE_DROP_UNC / SHUNT_RESISTANCE)**2 +
+    (voltage_drop * SHUNT_RESISTANCE_UNC / SHUNT_RESISTANCE**2)**2
+)  # Uncertainty in measured current
 
 force = np.abs(final_mass - initial_mass) * g  # Force in Newtons
+force_unc = np.sqrt(final_mass_unc**2 + init_mass_unc**2) * g  # Uncertainty in force
+
 
 exp_mu = (force * 2 * np.pi * height) / (measured_current**2 * l)  # Experimental permeability
-
+exp_mu_unc = exp_mu * np.sqrt(
+    (force_unc / force)**2 +
+    (height_unc / height)**2 +
+    (measured_current_unc / measured_current)**2 +
+    (l_unc / l)**2
+)  # Uncertainty in experimental permeability
 # Get the unique supply current values
+
+print(np.mean(force), np.mean(force_unc))
+print(np.mean(height), np.mean(height_unc))
+print(np.mean(measured_current), np.mean(measured_current_unc))
+print(np.mean(exp_mu), np.mean(exp_mu_unc))
+
+
 unique_supply_currents = np.unique(supply_current)
 
 def per_current():
@@ -48,7 +68,7 @@ def per_current():
         mask = np.isclose(supply_current, sc)
         
         plt.figure(figsize=(8,6))
-        plt.scatter(height[mask], force[mask], label=f'Supply Current = {sc:.2f} A')
+        plt.errorbar(height[mask], force[mask], yerr=force_unc[mask], fmt='o', capsize=4, label=f'Supply Current = {sc:.2f} A')
         x = np.linspace(min(height[mask]), max(height[mask]), 100)
         y = (mu_0 * sc**2 * l) / (2 * np.pi * x)  # Force in Newtons
         plt.plot(x, y, 'r-', label='Ideal Line')
