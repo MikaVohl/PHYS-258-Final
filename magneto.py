@@ -80,7 +80,19 @@ def mu_vs_current():
     plt.legend()
     plt.show()
 
+def mu_vs_height():
+    plt.figure(figsize=(8,6))
+    plt.scatter(height, exp_mu, label='Experimental Permeability')
+    plt.axhline(y=mu_0, color='r', linestyle='--', label='Theoretical Permeability (H/m)')
+    plt.xlabel('Height (m)')
+    plt.ylabel('Experimental Permeability (H/m)')
+    plt.title('Experimental Permeability vs Height')
+    plt.grid(True)
+    plt.legend()
+    plt.show()
+
 per_current()
-force_vs_height()
-force_vs_current()
-mu_vs_current()
+# force_vs_height()
+# force_vs_current()
+# mu_vs_current()
+mu_vs_height()
