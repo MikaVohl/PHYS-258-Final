@@ -48,11 +48,18 @@ topright = np.array([
     [0, 1.00, 10.00, 11.00]
 ])
 
+center *= 1e-3  # Convert to kg
+bottleft *= 1e-3
+bottright *= 1e-3
+topleft *= 1e-3
+topright *= 1e-3
+
 def linear(x, m, b):
     return m * x + b
 
 # Expected (true) mass values for each measurement column
 expected = np.array([0, 1, 10, 11])  # [no mass, 1g, 10g, 11g]
+expected = expected * 1e-3  # Convert to kg
 
 all_data = np.concatenate((center, bottleft, bottright, topleft, topright), axis=0)
 
@@ -123,5 +130,3 @@ def scale_to_true(y):
     # Convert scale reading to true mass
     x, sigma_x = scale_to_true_mass_and_uncertainty(y, **convert_params)
     return x, sigma_x
-
-plot_scale()
