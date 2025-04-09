@@ -27,6 +27,7 @@ initial_mass -= BASELINE_MASS
 final_mass -= BASELINE_MASS
 
 height_unc = PRINT_UNC # Possibly consider height uncertainty being 0.5mm since thats the absolute max it could be off by
+# height_unc = 0.5 * 1e-3 # in meters
 
 g = 9.81  # m/s^2
 l = 20 * 1e-2  # rod length in meters
@@ -104,7 +105,8 @@ def force_vs_current():
 
 def mu_vs_current():
     plt.figure(figsize=(8,6))
-    plt.scatter(measured_current, exp_mu, label='Experimental Permeability')
+    # plt.scatter(measured_current, exp_mu, label='Experimental Permeability')
+    plt.errorbar(measured_current, exp_mu, yerr=exp_mu_unc, fmt='o', label='Experimental Permeability')
     plt.axhline(y=mu_0, color='r', linestyle='--', label='Theoretical Permeability (H/m)')
     plt.xlabel('Current (A)')
     plt.ylabel('Experimental Permeability (H/m)')
@@ -115,7 +117,8 @@ def mu_vs_current():
 
 def mu_vs_height():
     plt.figure(figsize=(8,6))
-    plt.scatter(height, exp_mu, label='Experimental Permeability')
+    # plt.scatter(height, exp_mu, label='Experimental Permeability')
+    plt.errorbar(height, exp_mu, yerr=exp_mu_unc, fmt='o', label='Experimental Permeability')
     plt.axhline(y=mu_0, color='r', linestyle='--', label='Theoretical Permeability (H/m)')
     plt.xlabel('Height (m)')
     plt.ylabel('Experimental Permeability (H/m)')
@@ -127,5 +130,5 @@ def mu_vs_height():
 per_current()
 # force_vs_height()
 # force_vs_current()
-# mu_vs_current()
+mu_vs_current()
 mu_vs_height()
