@@ -52,6 +52,12 @@ exp_mu_unc = exp_mu * np.sqrt(
     (2 * measured_current_unc / measured_current)**2 +
     (l_unc / l)**2
 )
+
+weighted_mean_exp_mu = np.sum(exp_mu / exp_mu_unc**2) / np.sum(1 / exp_mu_unc**2)
+weighted_mean_exp_mu_unc = np.sqrt(1 / np.sum(1 / exp_mu_unc**2))
+
+print('Weighted mean experimental permeability:', weighted_mean_exp_mu)
+print('Weighted mean experimental permeability uncertainty:', weighted_mean_exp_mu_unc)
   # Uncertainty in experimental permeability
 # Get the unique supply current values
 
@@ -106,6 +112,20 @@ def force_vs_current():
     print('a and uncertainty', a, a_unc)
     print('b and uncertainty', b, b_unc)
 
+    y_fit = square(measured_current, a, b)
+    # Calculate chi-squared:
+    chi2 = np.sum(((force - y_fit) / force_unc)**2)
+
+    # Calculate the number of degrees of freedom:
+    ndof = len(force) - len(popt)  # number of data points minus number of fit parameters
+
+    # Calculate reduced chi-squared:
+    reduced_chi2 = chi2 / ndof
+
+    print('Reduced chi-squared:', reduced_chi2)
+    print('Chi-squared:', chi2)
+    print('Degrees of freedom:', ndof)
+
     plt.figure(figsize=(8,6))
     plt.scatter(measured_current, force, label='Force vs Current')
     x = np.linspace(min(measured_current), max(measured_current), 100)
@@ -124,7 +144,19 @@ def mu_vs_current():
     popt, pcov = curve_fit(linear, measured_current, exp_mu, sigma=exp_mu_unc, absolute_sigma=True)
     a, b = popt
     a_unc, b_unc = np.sqrt(np.diag(pcov))
+    
+    y_fit = linear(measured_current, a, b)
+    chi2 = np.sum(((exp_mu - y_fit) / exp_mu_unc)**2)
 
+    # Calculate the number of degrees of freedom:
+    ndof = len(exp_mu) - len(popt)
+
+    # Calculate reduced chi-squared:
+    reduced_chi2 = chi2 / ndof
+
+    print('Reduced chi-squared - linear:', reduced_chi2)
+    print('Chi-squared - linear:', chi2)
+    print('Degrees of freedom - linear:', ndof)
 
     plt.figure(figsize=(8,6))
     # plt.scatter(measured_current, exp_mu, label='Experimental Permeability')
@@ -154,13 +186,14 @@ def mu_vs_current():
     plt.show()
 
 def mu_vs_height():
+    
     # fit linear
     popt, pcov = curve_fit(linear, height, exp_mu, sigma=exp_mu_unc, absolute_sigma=True)
     a, b = popt
     a_unc, b_unc = np.sqrt(np.diag(pcov))
 
     plt.figure(figsize=(8,6))
-    # plt.scatter(height, exp_mu, label='Experimental Permeability')
+    # plt.scatter(height, exp_mu, label='Experimental Permeability)
     plt.errorbar(height, exp_mu, yerr=exp_mu_unc, fmt='o', label='Experimental Permeability')
     x = np.linspace(min(height), max(height), 100)
     y = linear(x, a, b)
@@ -186,8 +219,18 @@ def mu_vs_height():
     plt.grid(True)
     plt.show()
 
+    y_fit = linear(height, a, b)
+    chi2 = np.sum(((exp_mu - y_fit) / exp_mu_unc)**2)
+    # Calculate the number of degrees of freedom:
+    ndof = len(exp_mu) - len(popt)  # number of data points minus number of fit parameters
+    # Calculate reduced chi-squared:
+    reduced_chi2 = chi2 / ndof
+    print('Reduced chi-squared - linear:', reduced_chi2)
+    print('Chi-squared - linear:', chi2)
+    print('Degrees of freedom - linear:', ndof)
+
 # per_current()
 # force_vs_height()
-force_vs_current()
-# mu_vs_current()
-# mu_vs_height()
+# force_vs_current()
+mu_vs_current()
+mu_vs_height()

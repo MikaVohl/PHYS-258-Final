@@ -106,6 +106,11 @@ m, b = popt
 fit_line = linear(unique_x, m, b)
 group_residuals = group_mean_error - fit_line
 
+# Calculate the standard error of the fitted parameters
+m_unc, b_unc = np.sqrt(np.diag(pcov))
+print("Slope (m): {:.8e} ± {:.8e}".format(m, m_unc))
+print("Intercept (b): {:.8e} ± {:.8e}".format(b, b_unc))
+
 # ---------------------------
 # Conversion Functions Based on the Group Fit
 # ---------------------------
