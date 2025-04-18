@@ -229,8 +229,8 @@ def mu_vs_height():
     print('Chi-squared - linear:', chi2)
     print('Degrees of freedom - linear:', ndof)
 
-# per_current()
+per_current()
 # force_vs_height()
 # force_vs_current()
-mu_vs_current()
-mu_vs_height()
+# mu_vs_current()
+# mu_vs_height()
